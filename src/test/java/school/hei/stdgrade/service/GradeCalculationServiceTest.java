@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static school.hei.stdgrade.service.GradeCalculationService.YearDecision.INCOMPLETE;
 import static school.hei.stdgrade.service.GradeCalculationService.YearDecision.PASS;
@@ -104,7 +105,8 @@ class GradeCalculationServiceTest {
     grade1 = new Grade("grade-1", STUDENT_ID, EXAM_1_ID, 14.0);
     grade2 = new Grade("grade-2", STUDENT_ID, EXAM_2_ID, 16.0);
 
-    when(jExamMapper.toDomain(any(JExam.class)))
+    lenient()
+        .when(jExamMapper.toDomain(any(JExam.class)))
         .thenAnswer(
             inv -> {
               JExam je = inv.getArgument(0);
@@ -116,13 +118,15 @@ class GradeCalculationServiceTest {
                   je.getCourseId(),
                   je.getAcademicYearId());
             });
-    when(jGradeMapper.toDomain(any(JGrade.class)))
+    lenient()
+        .when(jGradeMapper.toDomain(any(JGrade.class)))
         .thenAnswer(
             inv -> {
               JGrade jg = inv.getArgument(0);
               return new Grade(jg.getId(), jg.getStudentId(), jg.getExamId(), jg.getScore());
             });
-    when(jCourseMapper.toDomain(any(JCourse.class)))
+    lenient()
+        .when(jCourseMapper.toDomain(any(JCourse.class)))
         .thenAnswer(
             inv -> {
               JCourse jc = inv.getArgument(0);
