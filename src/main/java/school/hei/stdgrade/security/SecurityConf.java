@@ -11,6 +11,7 @@ import static school.hei.stdgrade.security.model.UserRole.TEACHER;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -38,17 +39,35 @@ public class SecurityConf {
   }
 
   @Bean
-  public SecurityFilterChain filterChain(
+  @Order(1)
+  public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+    return http.securityMatcher("/web/**")
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/web/login")
+                    .permitAll()
+                    .requestMatchers("/web/**")
+                    .hasRole(ADMIN.name()))
+        .formLogin(
+            form -> form.loginPage("/web/login").loginProcessingUrl("/web/login").permitAll())
+        .build();
+  }
+
+  @Bean
+  @Order(2)
+  public SecurityFilterChain apiFilterChain(
       HttpSecurity http,
       BearerAuthFilter bearerAuthFilter,
       SelfAuthorizationManager selfAuthorizationManager)
       throws Exception {
-    return http.csrf(AbstractHttpConfigurer::disable)
+    return http.securityMatcher("/**")
+        .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
         .exceptionHandling(
             e -> e.authenticationEntryPoint(entryPoint).accessDeniedHandler(accessDeniedHandler))
         .authorizeHttpRequests(
             auth -> {
+              auth.requestMatchers("/error").permitAll();
               auth.requestMatchers("/login", "/ping").permitAll();
               identityAndAcademicStructureMatchers(auth, selfAuthorizationManager); // Dev 1
               gradesAndTranscriptMatchers(auth, selfAuthorizationManager); // Dev 2
