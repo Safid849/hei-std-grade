@@ -3,6 +3,7 @@ package school.hei.stdgrade.service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import school.hei.stdgrade.endpoint.event.EventProducer;
@@ -12,6 +13,7 @@ import school.hei.stdgrade.repository.JUserRepository;
 import school.hei.stdgrade.security.model.Principal;
 import school.hei.stdgrade.security.model.UserRole;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class TranscriptService {
@@ -30,7 +32,16 @@ public class TranscriptService {
       String studentId, String academicYearId, Principal principal) {
     checkSelfOrAdmin(studentId, principal);
     checkStudentExists(studentId);
-    eventProducer.accept(List.of(new TranscriptRequestedEvent(studentId, academicYearId)));
+
+    try {
+      eventProducer.accept(List.of(new TranscriptRequestedEvent(studentId, academicYearId)));
+    } catch (RuntimeException e) {
+      log.warn(
+          "Failed to publish TranscriptRequestedEvent(studentId={}, academicYearId={}): {}",
+          studentId,
+          academicYearId,
+          e.getMessage());
+    }
   }
 
   private void checkStudentExists(String studentId) {
