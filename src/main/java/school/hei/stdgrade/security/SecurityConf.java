@@ -2,6 +2,7 @@ package school.hei.stdgrade.security;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PATCH;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 import static school.hei.stdgrade.security.model.UserRole.ADMIN;
@@ -84,5 +85,18 @@ public class SecurityConf {
     auth.requestMatchers(PATCH, "/grades/{gradeId}").hasAnyRole(TEACHER.name(), ADMIN.name());
     auth.requestMatchers(GET, "/grades/{gradeId}/history").hasAnyRole(TEACHER.name(), ADMIN.name());
     auth.requestMatchers(GET, "/students/{studentId}/grades").access(selfAuthorizationManager);
+
+    auth.requestMatchers(
+            GET, "/students/{studentId}/academic-years/{academicYearId}/transcript-summary")
+        .access(selfAuthorizationManager);
+    auth.requestMatchers(
+            POST, "/students/{studentId}/academic-years/{academicYearId}/transcript-requests")
+        .access(selfAuthorizationManager);
+
+    auth.requestMatchers(GET, "/promotions").hasAnyRole(TEACHER.name(), ADMIN.name());
+    auth.requestMatchers(GET, "/promotions/{promotionYear}/graduates").hasRole(ADMIN.name());
+    auth.requestMatchers(GET, "/promotions/{promotionYear}/graduates.xlsx").hasRole(ADMIN.name());
+    auth.requestMatchers(GET, "/students/{studentId}/diploma-status")
+        .access(selfAuthorizationManager);
   }
 }
