@@ -22,7 +22,7 @@
         <tr th:each="year : ${promotions}">
             <td th:text="${year}">2024</td>
             <td>
-                <a th:href="@{/promotions/{year}/graduates.xlsx(year=${year})}">
+                <a th:href="@{/web/promotions/{year}/graduates.xlsx(year=${year})}">
                     Télécharger la liste des diplômés (.xlsx)
                 </a>
             </td>
