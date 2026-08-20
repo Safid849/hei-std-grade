@@ -1,5 +1,7 @@
 package school.hei.stdgrade.endpoint.web.controller;
 
+import static org.reflections.Reflections.log;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,13 +21,18 @@ public class PromotionWebController {
 
   @GetMapping("/web/promotions")
   public String listPromotions(Model model) {
-    model.addAttribute("promotions", diplomaService.getAllPromotions());
+    log.info("=== /web/promotions requested, fetching promotions ===");
+    var promotions = diplomaService.getAllPromotions();
+    log.info("Promotions found: {}", promotions);
+    model.addAttribute("promotions", promotions);
     return "promotions";
   }
 
   @GetMapping("/web/promotions/{promotionYear}/graduates.xlsx")
   public ResponseEntity<byte[]> downloadGraduatesXlsx(@PathVariable int promotionYear) {
+    log.info("=== /web/promotions/{}/graduates.xlsx requested ===", promotionYear);
     var graduates = diplomaService.getGraduatesByPromotion(promotionYear);
+    log.info("Graduates count: {}", graduates.size());
     var content = xlsxGenerator.generate(graduates);
     var filename = "diplomes-promotion-" + promotionYear + ".xlsx";
 
