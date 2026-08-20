@@ -1,11 +1,11 @@
 package school.hei.stdgrade.endpoint.web.controller;
 
-import static org.reflections.Reflections.log;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@Slf4j
 public class WebAuthController {
 
   @GetMapping("/web/login")
