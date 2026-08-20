@@ -11,7 +11,6 @@ import static school.hei.stdgrade.security.model.UserRole.TEACHER;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -44,61 +43,50 @@ public class SecurityConf {
   }
 
   @Bean
-  public FilterRegistrationBean<BearerAuthFilter> disableBearerAuthFilterAutoRegistration(
-      BearerAuthFilter bearerAuthFilter) {
-    var registration = new FilterRegistrationBean<>(bearerAuthFilter);
-    registration.setEnabled(false);
-    return registration;
-  }
-
-  @Bean
   @Order(1)
   public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
     log.info("=== Configuring webFilterChain for /web/** ===");
     return http.securityMatcher("/web/**")
-        .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers("/web/login")
-                    .permitAll()
-                    .requestMatchers("/web/**")
-                    .hasRole(ADMIN.name()))
-        .formLogin(
-            form -> form.loginPage("/web/login").loginProcessingUrl("/web/login").permitAll())
-        .build();
+            .authorizeHttpRequests(
+                    auth ->
+                            auth.requestMatchers("/web/login")
+                                    .permitAll()
+                                    .requestMatchers("/web/**")
+                                    .hasRole(ADMIN.name()))
+            .formLogin(
+                    form -> form.loginPage("/web/login").loginProcessingUrl("/web/login").permitAll())
+            .build();
   }
 
   @Bean
   @Order(2)
   public SecurityFilterChain apiFilterChain(
-      HttpSecurity http,
-      BearerAuthFilter bearerAuthFilter,
-      SelfAuthorizationManager selfAuthorizationManager)
-      throws Exception {
+          HttpSecurity http,
+          BearerAuthFilter bearerAuthFilter,
+          SelfAuthorizationManager selfAuthorizationManager)
+          throws Exception {
     log.info("=== Configuring apiFilterChain for /** (rest) ===");
     return http.securityMatcher("/**")
-        .csrf(AbstractHttpConfigurer::disable)
-        .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
-        .exceptionHandling(
-            e -> e.authenticationEntryPoint(entryPoint).accessDeniedHandler(accessDeniedHandler))
-        .authorizeHttpRequests(
-            auth -> {
-              auth.requestMatchers("/error").permitAll();
-              auth.requestMatchers("/login", "/ping").permitAll();
-              auth.requestMatchers(GET, "/css/**").permitAll();
-              identityAndAcademicStructureMatchers(auth, selfAuthorizationManager);
-              gradesAndTranscriptMatchers(auth, selfAuthorizationManager);
-
-              identityAndAcademicStructureMatchers(auth, selfAuthorizationManager);
-              gradesAndTranscriptMatchers(auth, selfAuthorizationManager);
-              auth.anyRequest().authenticated();
-            })
-        .addFilterBefore(bearerAuthFilter, UsernamePasswordAuthenticationFilter.class)
-        .build();
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(sm -> sm.sessionCreationPolicy(STATELESS))
+            .exceptionHandling(
+                    e -> e.authenticationEntryPoint(entryPoint).accessDeniedHandler(accessDeniedHandler))
+            .authorizeHttpRequests(
+                    auth -> {
+                      auth.requestMatchers("/error").permitAll();
+                      auth.requestMatchers("/login", "/ping").permitAll();
+                      auth.requestMatchers(GET, "/css/**").permitAll();
+                      identityAndAcademicStructureMatchers(auth, selfAuthorizationManager);
+                      gradesAndTranscriptMatchers(auth, selfAuthorizationManager);
+                      auth.anyRequest().authenticated();
+                    })
+            .addFilterBefore(bearerAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
   }
 
   private void identityAndAcademicStructureMatchers(
-      AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth,
-      AuthorizationManager<RequestAuthorizationContext> selfAuthorizationManager) {
+          AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth,
+          AuthorizationManager<RequestAuthorizationContext> selfAuthorizationManager) {
 
     auth.requestMatchers(GET, "/roles").permitAll();
 
@@ -134,36 +122,36 @@ public class SecurityConf {
     auth.requestMatchers(PUT, "/academic-years/{academicYearId}").hasRole(ADMIN.name());
 
     auth.requestMatchers(
-            GET, "/students/{studentId}/academic-years/{academicYearId}/group-assignment")
-        .access(selfAuthorizationManager);
+                    GET, "/students/{studentId}/academic-years/{academicYearId}/group-assignment")
+            .access(selfAuthorizationManager);
     auth.requestMatchers(
-            PUT, "/students/{studentId}/academic-years/{academicYearId}/group-assignment")
-        .hasRole(ADMIN.name());
+                    PUT, "/students/{studentId}/academic-years/{academicYearId}/group-assignment")
+            .hasRole(ADMIN.name());
     auth.requestMatchers(
-            DELETE, "/students/{studentId}/academic-years/{academicYearId}/group-assignment")
-        .hasRole(ADMIN.name());
+                    DELETE, "/students/{studentId}/academic-years/{academicYearId}/group-assignment")
+            .hasRole(ADMIN.name());
     auth.requestMatchers(GET, "/academic-years/{academicYearId}/groups/{groupId}/students")
-        .hasAnyRole(ADMIN.name(), TEACHER.name());
+            .hasAnyRole(ADMIN.name(), TEACHER.name());
 
     auth.requestMatchers(GET, "/courses/{courseId}/academic-years/{academicYearId}/teachers")
-        .permitAll();
+            .permitAll();
     auth.requestMatchers(PUT, "/courses/{courseId}/academic-years/{academicYearId}/teachers")
-        .hasRole(ADMIN.name());
+            .hasRole(ADMIN.name());
     auth.requestMatchers(
-            DELETE, "/teachers/{teacherId}/courses/{courseId}/academic-years/{academicYearId}")
-        .hasRole(ADMIN.name());
+                    DELETE, "/teachers/{teacherId}/courses/{courseId}/academic-years/{academicYearId}")
+            .hasRole(ADMIN.name());
     auth.requestMatchers(GET, "/teachers/{teacherId}/academic-years/{academicYearId}/courses")
-        .access(selfAuthorizationManager);
+            .access(selfAuthorizationManager);
   }
 
   private void gradesAndTranscriptMatchers(
-      AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth,
-      AuthorizationManager<RequestAuthorizationContext> selfAuthorizationManager) {
+          AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth,
+          AuthorizationManager<RequestAuthorizationContext> selfAuthorizationManager) {
 
     auth.requestMatchers(GET, "/courses/{courseId}/academic-years/{academicYearId}/exams")
-        .permitAll();
+            .permitAll();
     auth.requestMatchers(PUT, "/courses/{courseId}/academic-years/{academicYearId}/exams")
-        .hasAnyRole(TEACHER.name(), ADMIN.name());
+            .hasAnyRole(TEACHER.name(), ADMIN.name());
     auth.requestMatchers(GET, "/exams/{examId}").permitAll();
 
     auth.requestMatchers(PUT, "/grades").hasAnyRole(TEACHER.name(), ADMIN.name());
@@ -172,16 +160,16 @@ public class SecurityConf {
     auth.requestMatchers(GET, "/students/{studentId}/grades").access(selfAuthorizationManager);
 
     auth.requestMatchers(
-            GET, "/students/{studentId}/academic-years/{academicYearId}/transcript-summary")
-        .access(selfAuthorizationManager);
+                    GET, "/students/{studentId}/academic-years/{academicYearId}/transcript-summary")
+            .access(selfAuthorizationManager);
     auth.requestMatchers(
-            POST, "/students/{studentId}/academic-years/{academicYearId}/transcript-requests")
-        .access(selfAuthorizationManager);
+                    POST, "/students/{studentId}/academic-years/{academicYearId}/transcript-requests")
+            .access(selfAuthorizationManager);
 
     auth.requestMatchers(GET, "/promotions").hasAnyRole(TEACHER.name(), ADMIN.name());
     auth.requestMatchers(GET, "/promotions/{promotionYear}/graduates").hasRole(ADMIN.name());
     auth.requestMatchers(GET, "/promotions/{promotionYear}/graduates.xlsx").hasRole(ADMIN.name());
     auth.requestMatchers(GET, "/students/{studentId}/diploma-status")
-        .access(selfAuthorizationManager);
+            .access(selfAuthorizationManager);
   }
 }
