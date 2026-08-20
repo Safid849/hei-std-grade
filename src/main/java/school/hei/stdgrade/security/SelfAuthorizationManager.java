@@ -1,7 +1,6 @@
 package school.hei.stdgrade.security;
 
 import static school.hei.stdgrade.security.model.UserRole.ADMIN;
-import static school.hei.stdgrade.security.model.UserRole.TEACHER;
 
 import java.util.function.Supplier;
 import org.springframework.security.authorization.AuthorizationDecision;
@@ -23,14 +22,21 @@ public class SelfAuthorizationManager implements AuthorizationManager<RequestAut
       return new AuthorizationDecision(false);
     }
 
-    var uid = context.getVariables().get("userId");
-    if (uid == null) {
-      uid = context.getVariables().get("studentId");
+    if (principal.roles().contains(ADMIN)) {
+      return new AuthorizationDecision(true);
     }
 
-    var isStaff = principal.roles().contains(TEACHER) || principal.roles().contains(ADMIN);
-    var isSelf = uid != null && uid.equals(principal.user().id());
+    var variables = context.getVariables();
+    var targetId = variables.get("userId");
+    if (targetId == null) {
+      targetId = variables.get("studentId");
+    }
+    if (targetId == null) {
+      targetId = variables.get("teacherId");
+    }
 
-    return new AuthorizationDecision(isStaff || isSelf);
+    var isSelf = targetId != null && targetId.equals(principal.user().id());
+
+    return new AuthorizationDecision(isSelf);
   }
 }
