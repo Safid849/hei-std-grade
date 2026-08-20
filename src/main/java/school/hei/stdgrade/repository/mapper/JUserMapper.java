@@ -14,16 +14,16 @@ public class JUserMapper {
 
   public User toDomain(JUser entity, List<RoleName> roles) {
     return new User(
-            entity.getId(),
-            entity.getRef(),
-            entity.getLastName(),
-            entity.getFirstName(),
-            entity.getEmail(),
-            entity.getPasswordHash(),
-            entity.isEnabled(),
-            entity.getEntranceDate(),
-            entity.getTrackId(),
-            roles);
+        entity.getId(),
+        entity.getRef(),
+        entity.getLastName(),
+        entity.getFirstName(),
+        entity.getEmail(),
+        entity.getPasswordHash(),
+        entity.isEnabled(),
+        entity.getEntranceDate(),
+        entity.getTrackId(),
+        roles);
   }
 
   public JUser toEntity(User domain) {

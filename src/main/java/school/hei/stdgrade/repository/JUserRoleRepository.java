@@ -6,7 +6,7 @@ import school.hei.stdgrade.repository.model.JUserRole;
 import school.hei.stdgrade.repository.model.JUserRoleId;
 
 public interface JUserRoleRepository extends JpaRepository<JUserRole, JUserRoleId> {
-    List<JUserRole> findByIdUserId(String userId);
+  List<JUserRole> findByIdUserId(String userId);
 
-    void deleteByIdUserId(String userId);
+  void deleteByIdUserId(String userId);
 }

@@ -6,13 +6,13 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record CrupdateUserPayload(
-        String id,
-        String ref,
-        String lastName,
-        String firstName,
-        String email,
-        String password,
-        boolean isEnabled,
-        LocalDate entranceDate,
-        String trackId,
-        List<RoleName> roles) {}
+    String id,
+    String ref,
+    String lastName,
+    String firstName,
+    String email,
+    String password,
+    boolean isEnabled,
+    LocalDate entranceDate,
+    String trackId,
+    List<RoleName> roles) {}
