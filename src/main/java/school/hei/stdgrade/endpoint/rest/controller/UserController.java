@@ -21,26 +21,26 @@ import school.hei.stdgrade.service.UserService;
 @AllArgsConstructor
 @RequestMapping(produces = APPLICATION_JSON_VALUE)
 public class UserController {
-    private final UserService service;
+  private final UserService service;
 
-    @GetMapping("/users")
-    public List<User> getAllUsers(@RequestParam(required = false) RoleName role) {
-        return service.findAll(role);
-    }
+  @GetMapping("/users")
+  public List<User> getAllUsers(@RequestParam(required = false) RoleName role) {
+    return service.findAll(role);
+  }
 
-    @GetMapping("/users/{userId}")
-    public User getUserById(@PathVariable String userId) {
-        return service.getById(userId);
-    }
+  @GetMapping("/users/{userId}")
+  public User getUserById(@PathVariable String userId) {
+    return service.getById(userId);
+  }
 
-    @PutMapping("/users")
-    public User crupdateUser(@RequestBody CrupdateUserPayload payload) {
-        return service.crupdate(payload);
-    }
+  @PutMapping("/users")
+  public User crupdateUser(@RequestBody CrupdateUserPayload payload) {
+    return service.crupdate(payload);
+  }
 
-    @PutMapping("/users/{userId}/track")
-    public User assignStudentTrack(
-            @PathVariable String userId, @RequestBody AssignTrackPayload payload) {
-        return service.assignTrack(userId, payload.trackId());
-    }
+  @PutMapping("/users/{userId}/track")
+  public User assignStudentTrack(
+      @PathVariable String userId, @RequestBody AssignTrackPayload payload) {
+    return service.assignTrack(userId, payload.trackId());
+  }
 }

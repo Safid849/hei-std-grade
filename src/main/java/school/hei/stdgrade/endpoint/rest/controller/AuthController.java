@@ -15,10 +15,10 @@ import school.hei.stdgrade.service.UserService;
 @AllArgsConstructor
 @RequestMapping(produces = APPLICATION_JSON_VALUE)
 public class AuthController {
-    private final UserService service;
+  private final UserService service;
 
-    @PostMapping("/login")
-    public UserWithToken login(@RequestBody LoginPayload payload) {
-        return service.login(payload.email(), payload.password());
-    }
+  @PostMapping("/login")
+  public UserWithToken login(@RequestBody LoginPayload payload) {
+    return service.login(payload.email(), payload.password());
+  }
 }
