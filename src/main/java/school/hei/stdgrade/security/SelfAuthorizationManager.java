@@ -1,6 +1,7 @@
 package school.hei.stdgrade.security;
 
 import static school.hei.stdgrade.security.model.UserRole.ADMIN;
+import static school.hei.stdgrade.security.model.UserRole.TEACHER;
 
 import java.util.function.Supplier;
 import org.springframework.security.authorization.AuthorizationDecision;
@@ -23,6 +24,10 @@ public class SelfAuthorizationManager implements AuthorizationManager<RequestAut
     }
 
     if (principal.roles().contains(ADMIN)) {
+      return new AuthorizationDecision(true);
+    }
+
+    if (principal.roles().contains(TEACHER)) {
       return new AuthorizationDecision(true);
     }
 
