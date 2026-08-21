@@ -11,7 +11,6 @@ import static school.hei.stdgrade.security.model.UserRole.TEACHER;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -41,14 +40,6 @@ public class SecurityConf {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-  }
-
-  @Bean
-  public FilterRegistrationBean<BearerAuthFilter> disableBearerAuthFilterAutoRegistration(
-      BearerAuthFilter bearerAuthFilter) {
-    var registration = new FilterRegistrationBean<>(bearerAuthFilter);
-    registration.setEnabled(false);
-    return registration;
   }
 
   @Bean
@@ -85,9 +76,6 @@ public class SecurityConf {
               auth.requestMatchers("/error").permitAll();
               auth.requestMatchers("/login", "/ping").permitAll();
               auth.requestMatchers(GET, "/css/**").permitAll();
-              identityAndAcademicStructureMatchers(auth, selfAuthorizationManager);
-              gradesAndTranscriptMatchers(auth, selfAuthorizationManager);
-
               identityAndAcademicStructureMatchers(auth, selfAuthorizationManager);
               gradesAndTranscriptMatchers(auth, selfAuthorizationManager);
               auth.anyRequest().authenticated();
